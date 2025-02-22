@@ -37,4 +37,8 @@ contract RiskPool {
     function getPoolBalance() public view returns (uint256) {
         return totalPool;
     }
+
+    function getUserContribution(address user) public view returns (uint256) {
+        return contributions[user];
+    }
 }

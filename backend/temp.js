@@ -66,7 +66,7 @@ async function requestClaim(amount) {
 }
 
 async function main() {
-  await getPoolAmount(10);
+  await contributeToRiskPool(10);
 }
 
 main().catch(console.error);

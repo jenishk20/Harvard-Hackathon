@@ -4,6 +4,7 @@ const {
   ContractCallQuery,
   ContractId,
   Hbar,
+  ContractFunctionParameters,
 } = require("@hashgraph/sdk");
 require("dotenv").config();
 
@@ -12,20 +13,17 @@ const operatorKey = PrivateKey.fromString(process.env.HEDERA_PRIVATE_KEY);
 
 const client = Client.forTestnet().setOperator(operatorId, operatorKey);
 
-const contractId = "0.0.5615536";
+const contractId = "0.0.5615643";
 
 async function getPoolAmount() {
   console.log("🚀 Getting the pool balance...");
 
   const contractCallQuery = new ContractCallQuery()
     .setContractId(contractId)
-    .setFunction("getPoolBalance")
-    .setGas(100000) // You can adjust the gas if necessary
-    .freezeWith(client);
-
+    .setGas(100000)
+    .setFunction("getPoolBalance", new ContractFunctionParameters());
   const contractSubmit = await contractCallQuery.execute(client);
 
-  // Get the result of the query (in this case, it's a uint256)
   const poolBalance = contractSubmit.getUint256(0);
 
   console.log(`Pool Balance: ${poolBalance}`);

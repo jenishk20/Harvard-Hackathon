@@ -12,7 +12,9 @@
   "dependencies": {
     "@hashgraph/sdk": "^2.59.0",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "fs": "^0.0.1-security",
+    "mongoose": "^8.10.1",
     "solc": "^0.8.28"
   }
 }

@@ -31,6 +31,24 @@ async function contributeToRiskPool(amount) {
   console.log(`✅ Contribution successful! Status: ${contractReceipt.status}`);
 }
 
+async function getPoolAmount() {
+  console.log("🚀 Getting the pool balance...");
+
+  // Using ContractCallQuery to call a view function
+  const contractCallQuery = new ContractCallQuery()
+    .setContractId(contractId)
+    .setFunction("getPoolBalance")
+    .setGas(100000) // You can adjust the gas if necessary
+    .freezeWith(client);
+
+  const contractSubmit = await contractCallQuery.execute(client);
+
+  // Get the result of the query (in this case, it's a uint256)
+  const poolBalance = contractSubmit.getUint256(0);
+
+  console.log(`Pool Balance: ${poolBalance}`);
+}
+
 async function requestClaim(amount) {
   console.log("🚀 Requesting claim...");
 
@@ -48,7 +66,7 @@ async function requestClaim(amount) {
 }
 
 async function main() {
-  await contributeToRiskPool(10); // Make sure you're passing an amount in HBAR
+  await getPoolAmount(10);
 }
 
 main().catch(console.error);

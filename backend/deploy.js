@@ -8,14 +8,11 @@ const {
 } = require("@hashgraph/sdk");
 const fs = require("fs");
 
-// Load environment variables
 const operatorId = process.env.HEDERA_ACCOUNT_ID;
 const operatorKey = PrivateKey.fromString(process.env.HEDERA_PRIVATE_KEY);
 
-// Initialize Hedera client
 const client = Client.forTestnet().setOperator(operatorId, operatorKey);
 
-// Load contract bytecode
 const bytecode = fs.readFileSync("RiskPool_bytecode.bin");
 
 async function deployContract() {

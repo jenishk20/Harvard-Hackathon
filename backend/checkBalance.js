@@ -1,7 +1,7 @@
 const {
   Client,
   PrivateKey,
-  ContractExecuteTransaction,
+  ContractCallQuery,
   ContractId,
   Hbar,
 } = require("@hashgraph/sdk");
@@ -15,37 +15,20 @@ const client = Client.forTestnet().setOperator(operatorId, operatorKey);
 const contractId = "0.0.5615536";
 
 async function getPoolAmount() {
-  console.log("🚀 Contributing to the Risk Pool...");
+  console.log("🚀 Getting the pool balance...");
 
-  const contractExecuteTx = new ContractExecuteTransaction()
+  const contractCallQuery = new ContractCallQuery()
     .setContractId(contractId)
     .setFunction("getPoolBalance")
-    .setGas(100000)
+    .setGas(100000) // You can adjust the gas if necessary
     .freezeWith(client);
 
-  const contractSign = await contractExecuteTx.sign(operatorKey);
-  const contractSubmit = await contractSign.execute(client);
-  //   const result = await contractSubmit.getUint256(0);
-  const contractReceipt = await contractSubmit.getReceipt(client);
-  console.log(contractReceipt);
+  const contractSubmit = await contractCallQuery.execute(client);
 
-  console.log(`✅ Contribution successful! Status: ${contractReceipt.status}`);
-}
+  // Get the result of the query (in this case, it's a uint256)
+  const poolBalance = contractSubmit.getUint256(0);
 
-async function requestClaim(amount) {
-  console.log("🚀 Requesting claim...");
-
-  const contractExecuteTx = new ContractExecuteTransaction()
-    .setContractId(contractId)
-    .setFunction("requestClaim", [amount])
-    .setGas(1000000)
-    .freezeWith(client);
-
-  const contractSign = await contractExecuteTx.sign(operatorKey);
-  const contractSubmit = await contractSign.execute(client);
-  const contractReceipt = await contractSubmit.getReceipt(client);
-
-  console.log(`✅ Claim requested! Status: ${contractReceipt.status}`);
+  console.log(`Pool Balance: ${poolBalance}`);
 }
 
 async function main() {

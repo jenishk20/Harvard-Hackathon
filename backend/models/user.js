@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   publicKey: { type: String, required: true },
   privateKey: { type: String, required: true },
   balance: { type: Number, default: 0 },
+  accountId: { type: String },
 });
 
 const User = mongoose.model("User", userSchema);

@@ -13,7 +13,9 @@ const operatorKey = PrivateKey.fromString(process.env.HEDERA_PRIVATE_KEY);
 
 const client = Client.forTestnet().setOperator(operatorId, operatorKey);
 
-const bytecode = fs.readFileSync("RiskPool_bytecode.bin");
+const bytecode = fs.readFileSync(
+  "../backend/solidity/output/RiskPool_sol_RiskPool.bin"
+);
 
 async function deployContract() {
   console.log("🚀 Uploading bytecode to Hedera File Service...");
@@ -34,10 +36,10 @@ async function deployContract() {
   console.log("🚀 Deploying smart contract...");
 
   const contractTx = new ContractCreateTransaction()
-    .setBytecodeFileId(bytecodeFileId) // Use uploaded file ID
-    .setGas(5000000) // Gas Limit
-    .setAdminKey(operatorKey) // Set admin key
-    .setMaxTransactionFee(new Hbar(10)) // Max fee
+    .setBytecodeFileId(bytecodeFileId)
+    .setGas(5000000)
+    .setAdminKey(operatorKey)
+    .setMaxTransactionFee(new Hbar(10))
     .freezeWith(client);
 
   const contractSign = await contractTx.sign(operatorKey);

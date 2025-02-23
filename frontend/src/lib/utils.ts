@@ -6,6 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getTitleCase = (str: string) => {
+  if(!str) return str
   return str
     .toLowerCase()
     .split(" ")

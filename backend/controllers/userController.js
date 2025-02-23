@@ -164,8 +164,8 @@ const createWallet = async (req, res) => {
     await user.save();
 
     const txTransfer = new TransferTransaction()
-      .addHbarTransfer(mainAccountId, new Hbar(-30))
-      .addHbarTransfer(userAccountId, new Hbar(30));
+      .addHbarTransfer(mainAccountId, new Hbar(-80))
+      .addHbarTransfer(userAccountId, new Hbar(80));
 
     const transferTxResponse = await txTransfer.execute(client);
     const transferReceipt = await transferTxResponse.getReceipt(client);

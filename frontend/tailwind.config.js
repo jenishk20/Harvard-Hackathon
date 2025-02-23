@@ -18,6 +18,9 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+				gold: "#f7cf00",
+				silver: "#bababa",
+				bronze: "#c77c30",
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

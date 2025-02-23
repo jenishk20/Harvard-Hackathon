@@ -11,6 +11,7 @@ import Footer from "./components/Footer";
 import MicroInsurancePage from "./pages/insurances/micro-insurance";
 import PurchaseInsurancePage from "./pages/insurances/micro-insurance/plan";
 import ClaimsPage from "./pages/insurances/claims";
+import LandingPage from "./pages/landing";
 
 function App() {
   const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ function App() {
 		<AuthProvider>
 			<QueryClientProvider client={queryClient}>
 				<Routes>
+          <Route path="/" element={<LandingPage/>}/>
 					<Route path="/login" element={<LoginPage />} />
 					<Route path="/register" element={<RegisterPage />} />
 					<Route

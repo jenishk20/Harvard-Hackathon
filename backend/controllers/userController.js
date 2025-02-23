@@ -5,6 +5,7 @@ const {
   AccountId,
   TransferTransaction,
   AccountCreateTransaction,
+  AccountBalanceQuery,
 } = require("@hashgraph/sdk");
 const { PrivateKey, PublicKey } = require("@hashgraph/sdk");
 const client = require("../config/hederaClient");
@@ -12,7 +13,8 @@ const User = require("../models/user");
 
 const contractId = "0.0.5615643";
 const mainAccountId = process.env.HEDERA_ACCOUNT_ID;
-
+const mainAccountPrivateKey = process.env.HEDERA_PRIVATE_KEY;
+console.log(mainAccountId, mainAccountPrivateKey);
 const releaseClaim = async (req, res) => {
   try {
     const { userId, policyId, amount } = req.body;
@@ -108,8 +110,8 @@ const contribute = async (req, res) => {
     const userAccountId = userDetails.accountId;
     const userPrivateKey = PrivateKey.fromString(userDetails.privateKey);
     const txTransfer = new TransferTransaction()
-      .addHbarTransfer(userAccountId, new Hbar(-amount))
-      .addHbarTransfer(mainAccountId, new Hbar(amount));
+      .addHbarTransfer(userAccountId, new Hbar(-amount / 10))
+      .addHbarTransfer(mainAccountId, new Hbar(amount / 10));
 
     txTransfer.freezeWith(client);
     const signedTx = await txTransfer.sign(userPrivateKey);
@@ -158,14 +160,19 @@ const createWallet = async (req, res) => {
     await user.save();
 
     const txTransfer = new TransferTransaction()
-      .addHbarTransfer(mainAccountId, new Hbar(-2))
-      .addHbarTransfer(userAccountId, new Hbar(2));
+      .addHbarTransfer(mainAccountId, new Hbar(-30))
+      .addHbarTransfer(userAccountId, new Hbar(30));
 
     const transferTxResponse = await txTransfer.execute(client);
     const transferReceipt = await transferTxResponse.getReceipt(client);
 
+    const accountBalance = await new AccountBalanceQuery()
+      .setAccountId(userAccountId)
+      .execute(client);
+    console.log("Creating the wallet ", accountBalance.hbars.toString());
+
     if (transferReceipt.status._code === 22) {
-      user.balance += 2;
+      user.balance += 30;
       await user.save();
 
       res.status(200).json({
@@ -188,7 +195,7 @@ const createWallet = async (req, res) => {
 const getBalance = async (req, res) => {
   try {
     const { userId } = req.query;
-    const user = await User.findOne({ uid : userId });
+    const user = await User.findOne({ uid: userId });
     const balance = user?.balance || 0;
     res.json({ status: "success", balance });
   } catch (error) {
@@ -199,60 +206,89 @@ const getBalance = async (req, res) => {
 
 const investInPolicy = async (req, res) => {
   try {
-    const { userId, policyId, amount } = req.body;
-    const userDetails = await User.findOne({ uid: userId });
+    const { uid, policyId, duration, amount } = req.body;
+
+    const userDetails = await User.findOne({ uid: uid });
+    console.log(userDetails);
     if (!userDetails) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const policy = userDetails.policies.find((p) => p.policyId === policyId);
-    if (!policy) {
-      return res.status(404).json({ error: "Policy not found" });
-    }
-
-    if (policy.status !== "active") {
-      return res.status(400).json({ error: "Policy is not active" });
-    }
-
-    const totalClaimedAmount = (policy.amountClaimed || 0) + amount;
-    if (totalClaimedAmount > policy.sumInsured) {
-      return res.status(400).json({ error: "Claim exceeds sum insured" });
+    const existingPolicy = userDetails.policies.find(
+      (p) => p.planName === policyId && p.duration === duration
+    );
+    if (existingPolicy) {
+      return res
+        .status(400)
+        .json({ error: "User has already purchased this policy" });
     }
 
     const userAccountId = userDetails.accountId;
+    const userPrivateKey = PrivateKey.fromString(userDetails.privateKey);
+
+    const amountInHbars = Math.floor(Number(amount));
+    const accountBalance = await new AccountBalanceQuery()
+      .setAccountId(userAccountId)
+      .execute(client);
+    const accountBalance1 = await new AccountBalanceQuery()
+      .setAccountId(mainAccountId)
+      .execute(client);
+
+    console.log("Account ", accountBalance.hbars.toString());
+    console.log("Account 1", accountBalance1.hbars.toString());
 
     const txTransfer = await new TransferTransaction()
-      .addHbarTransfer(userAccountId, new Hbar(-amount))
-      .addHbarTransfer(mainAccountId, new Hbar(amount))
+      .addHbarTransfer(userAccountId, new Hbar(-amountInHbars))
+      .addHbarTransfer(mainAccountId, new Hbar(amountInHbars))
       .freezeWith(client);
 
-    const signedTx = await txTransfer.sign(mainAccountPrivateKey);
-
+    const signedTx = await txTransfer.sign(userPrivateKey);
     const transferTxResponse = await signedTx.execute(client);
     const transferReceipt = await transferTxResponse.getReceipt(client);
 
     if (transferReceipt.status._code === 22) {
-      userDetails.balance -= amount;
-      policy.amountClaimed = totalClaimedAmount;
-      policy.sumInsured += amount;
-      if (policy.amountClaimed >= policy.sumInsured) {
-        policy.status = "completed";
-      }
+      const newPolicy = {
+        planName: policyId,
+        duration,
+        amount: amountInHbars,
+      };
+
+      userDetails.policies.push(newPolicy);
+      userDetails.balance -= amountInHbars;
 
       await userDetails.save();
 
       res.status(200).json({
         status: "success",
-        message: `${amount} HBAR successfully transferred to the user wallet`,
-        transactionId: transferReceipt.transactionId.toString(),
-        balance: userDetails.balance,
-        policyStatus: policy.status,
-        totalClaimed: policy.amountClaimed,
+        message: `${amountInHbars} HBAR successfully transferred and Policy ${policyId} purchased`,
+        policyDetails: newPolicy,
       });
+    } else {
+      return res.status(500).json({ error: "HBAR Transfer failed" });
     }
   } catch (error) {
     console.error("Error in investInPolicy function:", error);
-    res.status(500).json({ error: "Failed to transfer HBAR" });
+    res.status(500).json({ error: "Failed to purchase policy" });
+  }
+};
+
+const getPolicies = async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    const userDetails = await User.findOne({ uid: userId });
+
+    if (!userDetails) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({
+      status: "success",
+      policies: userDetails.policies,
+    });
+  } catch (error) {
+    console.error("Error in getPolicies function:", error);
+    res.status(500).json({ error: "Failed to get policies" });
   }
 };
 
@@ -263,4 +299,5 @@ module.exports = {
   getBalance,
   releaseClaim,
   investInPolicy,
+  getPolicies,
 };

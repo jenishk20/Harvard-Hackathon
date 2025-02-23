@@ -2,15 +2,15 @@
 export interface Plan {
 	plan_name: "Bronze" | "Silver" | "Gold";
 	price: number;
-	coverage_percentage: string;
+	coverage: string;
 	additional_features: string[];
 }
 
 export const PLANS: Plan[] = [
 	{
 		plan_name: "Bronze",
-		price: 500,
-		coverage_percentage: "60%",
+		price: 10,
+		coverage: "60% coverage up to 1000 HBARs",
 		additional_features: [
 			"Basic medical coverage",
 			"Limited prescription drug coverage",
@@ -19,8 +19,8 @@ export const PLANS: Plan[] = [
 	},
 	{
 		plan_name: "Silver",
-		price: 750,
-		coverage_percentage: "80%",
+		price: 20,
+		coverage: "80% coverage up to 2000 HBARs",
 		additional_features: [
 			"Basic medical coverage",
 			"Limited prescription drug coverage",
@@ -32,8 +32,8 @@ export const PLANS: Plan[] = [
 	},
 	{
 		plan_name: "Gold",
-		price: 1000,
-		coverage_percentage: "100%",
+		price: 30,
+		coverage: "100% coverage up to 5000 HBARs",
 		additional_features: [
 			"Basic medical coverage",
 			"Limited prescription drug coverage",
@@ -45,5 +45,3 @@ export const PLANS: Plan[] = [
 		],
 	},
 ];
-
-

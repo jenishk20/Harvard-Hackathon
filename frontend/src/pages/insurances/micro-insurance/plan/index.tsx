@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate, useParams, useLocation } from "react-router";
-import { useEffect, useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,6 +15,8 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PLANS } from "@/insurance";
 import { getAuth } from "firebase/auth";
 import { toast } from "sonner";
+import { getTitleCase } from "@/lib/utils";
+import { useState } from "react";
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 interface PurchaseDataType {
   date: string;
@@ -59,13 +60,7 @@ export default function PurchaseInsurancePage() {
   );
   const total = insuranceCost + platformFee;
 
-  const getTitleCase = (str: string) => {
-    return str
-      .toLowerCase()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
+
 
   if (!plan) {
     navigate("/insurances/micro-insurance");
@@ -108,7 +103,7 @@ export default function PurchaseInsurancePage() {
         description: "Your policy purchase has been successfully processed.",
       });
       navigate("/insurances/micro-insurance");
-    } catch (error) {
+    } catch (error : any) {
       toast.error("Transaction Failed ❌", {
         description: error.message,
       });
@@ -193,8 +188,7 @@ export default function PurchaseInsurancePage() {
 
                 <div>Premium</div>
                 <div>
-                  {insuranceCost.toFixed(2) -
-                    basePrice.toFixed(2) * purchaseData.duration}{" "}
+                  {(insuranceCost - basePrice * purchaseData.duration).toFixed(2)}{" "}
                   HBAR
                 </div>
 

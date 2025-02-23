@@ -10,5 +10,6 @@ router.post("/investInPolicy", userController.investInPolicy);
 router.post("/releaseClaim", userController.releaseClaim);
 router.get("/getPolicies", userController.getPolicies);
 router.get("/getContributions", userController.getContributions);
+router.get("/getClaims", userController.getClaims);
 
 module.exports = router;

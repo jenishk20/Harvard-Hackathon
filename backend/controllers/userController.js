@@ -14,7 +14,7 @@ const User = require("../models/user");
 const contractId = "0.0.5615643";
 const mainAccountId = process.env.HEDERA_ACCOUNT_ID;
 const mainAccountPrivateKey = process.env.HEDERA_PRIVATE_KEY;
-console.log(mainAccountId, mainAccountPrivateKey);
+
 const releaseClaim = async (req, res) => {
   try {
     const { userId, policyId, amount } = req.body;
@@ -313,6 +313,24 @@ const getContributions = async (req, res) => {
   }
 };
 
+const getClaims = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const userDetails = await User.findOne({ uid: userId });
+    if (!userDetails) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    console.log("User Details", userDetails);
+    res.status(200).json({
+      status: "success",
+      claims: userDetails.policies[0].claims,
+    });
+  } catch (error) {
+    console.error("Error in getClaims function:", error);
+    res.status(500).json({ error: "Failed to get claims" });
+  }
+};
+
 module.exports = {
   contribute,
   createWallet,
@@ -322,4 +340,5 @@ module.exports = {
   investInPolicy,
   getPolicies,
   getContributions,
+  getClaims,
 };

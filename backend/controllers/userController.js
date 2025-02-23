@@ -13,6 +13,66 @@ const User = require("../models/user");
 const contractId = "0.0.5615643";
 const mainAccountId = process.env.HEDERA_ACCOUNT_ID;
 
+const releaseClaim = async (req, res) => {
+  try {
+    const { userId, policyId, amount } = req.body;
+    const userDetails = await User.findOne({ uid: userId });
+    if (!userDetails) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const policy = userDetails.policies.find((p) => p.policyId === policyId);
+    if (!policy) {
+      return res.status(404).json({ error: "Policy not found" });
+    }
+
+    if (policy.status !== "active") {
+      return res.status(400).json({ error: "Policy is not active" });
+    }
+
+    const totalClaimedAmount = (policy.amountClaimed || 0) + amount;
+    if (totalClaimedAmount > policy.sumInsured) {
+      return res.status(400).json({ error: "Claim exceeds sum insured" });
+    }
+
+    const userAccountId = userDetails.accountId;
+
+    const txTransfer = await new TransferTransaction()
+      .addHbarTransfer(mainAccountId, new Hbar(-amount))
+      .addHbarTransfer(userAccountId, new Hbar(amount))
+      .freezeWith(client);
+
+    const signedTx = await txTransfer.sign(mainAccountPrivateKey);
+
+    const transferTxResponse = await signedTx.execute(client);
+    const transferReceipt = await transferTxResponse.getReceipt(client);
+
+    if (transferReceipt.status._code === 22) {
+      userDetails.balance += amount;
+      policy.amountClaimed = totalClaimedAmount;
+      if (policy.amountClaimed >= policy.sumInsured) {
+        policy.status = "completed";
+      }
+
+      await userDetails.save();
+
+      res.status(200).json({
+        status: "success",
+        message: `${amount} HBAR successfully transferred to the user wallet`,
+        transactionId: transferReceipt.transactionId.toString(),
+        balance: userDetails.balance,
+        policyStatus: policy.status,
+        totalClaimed: policy.amountClaimed,
+      });
+    } else {
+      res.status(500).json({ error: "Failed to transfer HBAR" });
+    }
+  } catch (error) {
+    console.error("Error in releaseClaim function:", error);
+    res.status(500).json({ error: "Failed to release claim" });
+  }
+};
+
 const getContribution = async (req, res) => {
   try {
     const { userId } = req.query;
@@ -137,4 +197,70 @@ const getBalance = async (req, res) => {
   }
 };
 
-module.exports = { contribute, createWallet, getContribution, getBalance };
+const investInPolicy = async (req, res) => {
+  try {
+    const { userId, policyId, amount } = req.body;
+    const userDetails = await User.findOne({ uid: userId });
+    if (!userDetails) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const policy = userDetails.policies.find((p) => p.policyId === policyId);
+    if (!policy) {
+      return res.status(404).json({ error: "Policy not found" });
+    }
+
+    if (policy.status !== "active") {
+      return res.status(400).json({ error: "Policy is not active" });
+    }
+
+    const totalClaimedAmount = (policy.amountClaimed || 0) + amount;
+    if (totalClaimedAmount > policy.sumInsured) {
+      return res.status(400).json({ error: "Claim exceeds sum insured" });
+    }
+
+    const userAccountId = userDetails.accountId;
+
+    const txTransfer = await new TransferTransaction()
+      .addHbarTransfer(userAccountId, new Hbar(-amount))
+      .addHbarTransfer(mainAccountId, new Hbar(amount))
+      .freezeWith(client);
+
+    const signedTx = await txTransfer.sign(mainAccountPrivateKey);
+
+    const transferTxResponse = await signedTx.execute(client);
+    const transferReceipt = await transferTxResponse.getReceipt(client);
+
+    if (transferReceipt.status._code === 22) {
+      userDetails.balance -= amount;
+      policy.amountClaimed = totalClaimedAmount;
+      policy.sumInsured += amount;
+      if (policy.amountClaimed >= policy.sumInsured) {
+        policy.status = "completed";
+      }
+
+      await userDetails.save();
+
+      res.status(200).json({
+        status: "success",
+        message: `${amount} HBAR successfully transferred to the user wallet`,
+        transactionId: transferReceipt.transactionId.toString(),
+        balance: userDetails.balance,
+        policyStatus: policy.status,
+        totalClaimed: policy.amountClaimed,
+      });
+    }
+  } catch (error) {
+    console.error("Error in investInPolicy function:", error);
+    res.status(500).json({ error: "Failed to transfer HBAR" });
+  }
+};
+
+module.exports = {
+  contribute,
+  createWallet,
+  getContribution,
+  getBalance,
+  releaseClaim,
+  investInPolicy,
+};

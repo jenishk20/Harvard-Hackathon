@@ -6,5 +6,7 @@ router.post("/contribute", userController.contribute);
 router.get("/getContribution", userController.getContribution);
 router.post("/createWallet", userController.createWallet);
 router.get("/getBalance", userController.getBalance);
+router.post("/investInPolicy", userController.investInPolicy);
+router.post("/releaseClaim", userController.releaseClaim);
 
 module.exports = router;

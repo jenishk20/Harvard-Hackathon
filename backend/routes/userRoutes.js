@@ -9,5 +9,6 @@ router.get("/getBalance", userController.getBalance);
 router.post("/investInPolicy", userController.investInPolicy);
 router.post("/releaseClaim", userController.releaseClaim);
 router.get("/getPolicies", userController.getPolicies);
+router.get("/getContributions", userController.getContributions);
 
 module.exports = router;

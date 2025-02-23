@@ -6,7 +6,11 @@ const policySchema = new mongoose.Schema({
   amount: { type: Number, required: true },
 });
 
-module.exports = policySchema;
+const contributionSchema = new mongoose.Schema({
+  amount: { type: Number, required: true },
+  cause: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
+});
 
 const userSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
@@ -15,6 +19,7 @@ const userSchema = new mongoose.Schema({
   balance: { type: Number, default: 0 },
   accountId: { type: String },
   policies: [policySchema],
+  contributions: [contributionSchema],
 });
 
 const User = mongoose.model("User", userSchema);

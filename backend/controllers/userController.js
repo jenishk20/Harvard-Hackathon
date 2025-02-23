@@ -104,14 +104,14 @@ const getContribution = async (req, res) => {
 
 const contribute = async (req, res) => {
   try {
-    const { userId, amount } = req.body;
+    const { userId, amount, cause } = req.body;
 
     const userDetails = await User.findOne({ uid: userId });
     const userAccountId = userDetails.accountId;
     const userPrivateKey = PrivateKey.fromString(userDetails.privateKey);
     const txTransfer = new TransferTransaction()
-      .addHbarTransfer(userAccountId, new Hbar(-amount / 10))
-      .addHbarTransfer(mainAccountId, new Hbar(amount / 10));
+      .addHbarTransfer(userAccountId, new Hbar(-amount))
+      .addHbarTransfer(mainAccountId, new Hbar(amount));
 
     txTransfer.freezeWith(client);
     const signedTx = await txTransfer.sign(userPrivateKey);
@@ -123,6 +123,10 @@ const contribute = async (req, res) => {
       return;
     }
     userDetails.balance -= amount;
+    userDetails.contributions.push({
+      amount: amount,
+      cause: cause,
+    });
     await userDetails.save();
     res.json({
       status: "success",
@@ -292,6 +296,23 @@ const getPolicies = async (req, res) => {
   }
 };
 
+const getContributions = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const userDetails = await User.findOne({ uid: userId });
+    if (!userDetails) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json({
+      status: "success",
+      contributions: userDetails.contributions,
+    });
+  } catch (error) {
+    console.error("Error in getContributions function:", error);
+    res.status(500).json({ error: "Failed to get contributions" });
+  }
+};
+
 module.exports = {
   contribute,
   createWallet,
@@ -300,4 +321,5 @@ module.exports = {
   releaseClaim,
   investInPolicy,
   getPolicies,
+  getContributions,
 };

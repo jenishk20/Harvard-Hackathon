@@ -7,7 +7,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import register from "../../assets/images/register.jpg";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { toast } from "sonner";
@@ -131,7 +130,7 @@ export default function RegisterPage() {
 			</div>
 			<div className="w-full h-full hidden md:block">
 				<img
-					src={register}
+					src="/images/register.jpg"
 					alt="register"
 					className="w-full h-full object-cover"
 				/>

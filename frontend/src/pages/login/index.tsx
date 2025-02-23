@@ -6,7 +6,6 @@ import { auth } from "@/lib/firebase";
 import { useMutation } from "@tanstack/react-query";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
-import login from "../../assets/images/login.jpg"
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -88,7 +87,7 @@ export default function LoginPage(){
 			</div>
 			<div className="w-full h-full hidden md:block">
 				<img
-					src={login}
+					src="/images/login.jpg"
 					alt="login"
 					className="w-full h-full object-cover"
 				/>

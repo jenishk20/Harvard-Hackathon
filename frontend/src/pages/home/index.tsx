@@ -37,7 +37,7 @@ export default function HomePage(){
 	})
 
     return (
-			<div className="w-screen mt-16 flex flex-col items-start justify-start my-4">
+			<div className="w-screen h-[97vh] mt-16 flex flex-col items-start justify-start">
 				<div className="px-12 py-6 space-y-4 bg-primary/10 w-full">
 					<h1 className="text-2xl font-heading font-bold">
 						Welcome, {currentUser?.displayName}{" "}
@@ -47,7 +47,6 @@ export default function HomePage(){
 					<p className="text-7xl font-bold drop-shadow-lg">{ balanceClient.isPending ? "XXXX"  : balanceClient.data?.balance} <span className="-ml-4 text-lg">HBAR</span></p>
 				</div>
 				</div>
-				
 			</div>
 		);
 }

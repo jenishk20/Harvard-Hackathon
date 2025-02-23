@@ -25,8 +25,8 @@ export default function LoginPage(){
 	const { isPending, mutate } = useMutation({
 		mutationFn: ({ email, password }: LoginData) =>
 			signInWithEmailAndPassword(auth, email, password),
-		onSuccess: () => {
-			toast.success("User registered successfully");
+		onSuccess: (data) => {
+			toast.success(`Welcome back! 🎉 ${data.user.displayName}`);
       navigate("/home");
 		},
     onError: (error) => {
@@ -43,9 +43,9 @@ export default function LoginPage(){
 	return (
 		<div className="w-screen h-screen grid grid-cols-1 md:grid-cols-2">
 			<div className="w-full h-full flex justify-center items-center bg-secondary">
-				<Card className="w-full lg:max-w-2xl md:max-w-xl max-w-lg mx-2">
+				<Card className="w-full lg:max-w-2xl md:max-w-xl max-w-lg mx-8">
 					<CardHeader>
-						<h1 className="text-2xl font-bold">Login</h1>
+						<h1 className="text-2xl font-bold font-heading">Login</h1>
 					</CardHeader>
 					<CardContent>
 						<form onSubmit={handleRegistration} className="space-y-3">
@@ -80,7 +80,9 @@ export default function LoginPage(){
 						</form>
 					</CardContent>
           <CardFooter>
-            New user? <Link to="/register" className="text-primary">Register</Link>
+						<p className="text-sm text-muted-foreground">
+            New user? <Link to="/register" className="text-primary"> Register</Link>
+						</p>
           </CardFooter>
 				</Card>
 			</div>

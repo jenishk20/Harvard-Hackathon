@@ -8,7 +8,8 @@ export default {
   ],
   theme: {
 		fontFamily : {
-			primary : "DM Sans, sans-serif",
+			heading : "Domine",
+			primary : "Inter",
 		},
   	extend: {
   		borderRadius: {

@@ -188,7 +188,7 @@ const createWallet = async (req, res) => {
 const getBalance = async (req, res) => {
   try {
     const { userId } = req.query;
-    const user = await User.findOne({ userId });
+    const user = await User.findOne({ uid : userId });
     const balance = user?.balance || 0;
     res.json({ status: "success", balance });
   } catch (error) {

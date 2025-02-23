@@ -108,6 +108,31 @@ export default function Navbar({ currentUser }: { currentUser: User }) {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuTrigger>About Us</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                {/* <NavigationMenuLink href="/about">
+                  <div className="w-full h-full md:w-[400px] lg:w-[500px] px-4 py-2 space-y-2">
+                    <h1 className="font-semibold flex items-center">
+                      Our Mission <ArrowRight className="h-4 w-4 ml-2" />
+                    </h1>
+                    <p className="text-muted-foreground text-sm">
+                      Learn more about our commitment to providing accessible
+                      insurance solutions to everyone.
+                    </p>
+                  </div>
+                </NavigationMenuLink>
+                <Separator /> */}
+                <NavigationMenuLink href="/team">
+                  <div className="w-full h-full md:w-[400px] lg:w-[500px] px-4 py-2 space-y-2">
+                    <h1 className="font-semibold flex items-center">
+                      Our Team <ArrowRight className="h-4 w-4 ml-2" />
+                    </h1>
+                    <p className="text-muted-foreground text-sm">
+                      Meet the people behind InsureMe and learn about our
+                      journey.
+                    </p>
+                  </div>
+                </NavigationMenuLink>
+              </NavigationMenuContent>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>

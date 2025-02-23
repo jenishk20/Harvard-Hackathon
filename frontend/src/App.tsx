@@ -12,6 +12,7 @@ import MicroInsurancePage from "./pages/insurances/micro-insurance";
 import PurchaseInsurancePage from "./pages/insurances/micro-insurance/plan";
 import ClaimsPage from "./pages/insurances/claims";
 import LandingPage from "./pages/landing";
+import TeamPage from "./pages/team";
 
 function App() {
   const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ function App() {
 						path="/claims/assistance"
 						element={<ProtectedRoute component={<ClaimsPage />} />}
 					/>
+          <Route path="/team" element={<TeamPage/>}/>
 				</Routes>
 				<Toaster richColors theme="light" />
 				<Footer />

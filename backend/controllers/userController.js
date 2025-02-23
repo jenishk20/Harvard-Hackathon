@@ -67,7 +67,7 @@ const contribute = async (req, res) => {
 };
 
 const createWallet = async (req, res) => {
-  console.log("Coming over here", req.body);
+  console.log("Coming over here", req);
   try {
     const { userId } = req.body;
     const privateKey = PrivateKey.generate();

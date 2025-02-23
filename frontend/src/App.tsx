@@ -10,9 +10,10 @@ import PartnerPage from "./pages/insurances/partner";
 import Footer from "./components/Footer";
 import MicroInsurancePage from "./pages/insurances/micro-insurance";
 import PurchaseInsurancePage from "./pages/insurances/micro-insurance/plan";
+import ClaimsPage from "./pages/insurances/claims";
 
 function App() {
-	const queryClient = new QueryClient();
+  const queryClient = new QueryClient();
 
 	return (
 		<AuthProvider>
@@ -20,13 +21,29 @@ function App() {
 				<Routes>
 					<Route path="/login" element={<LoginPage />} />
 					<Route path="/register" element={<RegisterPage />} />
-					<Route path="/home" element={<ProtectedRoute component={<HomePage/>} />} />
-					<Route path="/insurances/partner" element={<ProtectedRoute component={<PartnerPage/>}/>} />
-					<Route path="/insurances/micro-insurance" element={<ProtectedRoute component={<MicroInsurancePage/>}/>} />
-					<Route path="/insurances/micro-insurance/:plan" element={<ProtectedRoute component={<PurchaseInsurancePage/>}/>} />
+					<Route
+						path="/home"
+						element={<ProtectedRoute component={<HomePage />} />}
+					/>
+					<Route
+						path="/insurances/partner"
+						element={<ProtectedRoute component={<PartnerPage />} />}
+					/>
+					<Route
+						path="/insurances/micro-insurance"
+						element={<ProtectedRoute component={<MicroInsurancePage />} />}
+					/>
+					<Route
+						path="/insurances/micro-insurance/:plan"
+						element={<ProtectedRoute component={<PurchaseInsurancePage />} />}
+					/>
+					<Route
+						path="/claims/assistance"
+						element={<ProtectedRoute component={<ClaimsPage />} />}
+					/>
 				</Routes>
-				<Toaster richColors theme="light"/>
-				<Footer/>
+				<Toaster richColors theme="light" />
+				<Footer />
 			</QueryClientProvider>
 		</AuthProvider>
 	);

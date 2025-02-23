@@ -110,8 +110,10 @@ const ClaimsPage = () => {
     formDataToSend.append("date", formData.date);
     formDataToSend.append("amount", formData.amount);
     formDataToSend.append("file", file);
+    formDataToSend.append("userId", currentUser?.uid || "");
+    formDataToSend.append("planName", userPolicy?.planName || "");
 
-    const response = await fetch("http://localhost:3000/file/extractData", {
+    const response = await fetch(`${BASE_URL}/file/extractData`, {
       method: "POST",
       body: formDataToSend,
     });

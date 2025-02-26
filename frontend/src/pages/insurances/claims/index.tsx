@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { extractFromFile } from "../../../lib/extractFromFile";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -75,7 +74,6 @@ const ClaimsPage = () => {
     }
   };
 
-  const [fileError, setFileError] = useState<string | null>(null);
   const userPolicy = policiesClient?.data?.policies?.[0] || null;
 
   const selectedPlan = PLANS.find(
@@ -84,7 +82,7 @@ const ClaimsPage = () => {
   );
 
   const handleSubmit = (e: any) => {
-    handleFileValidation(formData.file);
+    handleFileValidation(formData?.file);
     e.preventDefault();
   };
 
@@ -104,7 +102,12 @@ const ClaimsPage = () => {
     }, 3000);
   };
 
-  const handleFileValidation = async (file: File) => {
+  const handleFileValidation = async (file: File | null) => {
+    if (!file) {
+      console.error("No file provided for validation.");
+      return;
+    }
+
     const formDataToSend = new FormData();
     formDataToSend.append("reason", formData.reason);
     formDataToSend.append("date", formData.date);
